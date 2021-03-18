@@ -133,13 +133,11 @@ func (s *scaffold) tmplExec(tmplSet templateSet, d data) error {
 	s.debugPrintf("distAbsFilePath:%s\n", distAbsFilePath)
 
 	if err := os.MkdirAll(filepath.Dir(distAbsFilePath), os.ModePerm); err != nil {
-		log.Println("masuk sini")
 		return pkgErr.WithStack(err)
 	}
 	log.Println(distAbsFilePath)
 	dist, err := os.Create(distAbsFilePath)
 	if err != nil {
-		log.Println("masuk sini1")
 		return pkgErr.WithStack(err)
 	}
 	defer dist.Close()

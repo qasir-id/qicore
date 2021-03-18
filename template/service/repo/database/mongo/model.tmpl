@@ -3,7 +3,7 @@ package mongo
 import (
 	"context"
 
-	"gitlab.com/qasir/{{.projectName}}.git/util"
+	"gitlab.com/qasir/{{.ProjectName}}.git/util"
 
 	"gitlab.com/qasir/web/project/qasircore.git/logger"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,13 +18,13 @@ func (m *Model) Find(ctx context.Context, collection string, data interface{},
 	filter map[string]interface{}, opt *options.FindOptions) (err error) {
 	cursor, err := MongoDB.Collection(collection).Find(ctx, filter, opt)
 	if err != nil {
-		logger.LogEntry(ctx).Errorf("[{{.projectName}}] Mongo Find Error: %v", err.Error())
+		logger.LogEntry(ctx).Errorf("[{{.ProjectName}}] Mongo Find Error: %v", err.Error())
 		return
 	}
 	defer cursor.Close(ctx)
 	err = cursor.All(ctx, data)
 	if err != nil {
-		logger.LogEntry(ctx).Errorf("[{{.projectName}}] Mongo Find Cursor Error: %v", err.Error())
+		logger.LogEntry(ctx).Errorf("[{{.ProjectName}}] Mongo Find Cursor Error: %v", err.Error())
 		return
 	}
 
@@ -42,7 +42,7 @@ func (m *Model) FindOne(ctx context.Context, collection string, data interface{}
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			err = util.ErrNotFound(collection)
-			logger.LogEntry(ctx).Errorf("[{{.projectName}}] Mongo Find One Error: %v", err.Error())
+			logger.LogEntry(ctx).Errorf("[{{.ProjectName}}] Mongo Find One Error: %v", err.Error())
 			return
 		}
 
@@ -55,7 +55,7 @@ func (m *Model) FindOne(ctx context.Context, collection string, data interface{}
 func (m *Model) InsertOne(ctx context.Context, collection string, data interface{}) (id primitive.ObjectID, err error) {
 	res, err := MongoDB.Collection(collection).InsertOne(ctx, data)
 	if err != nil {
-		logger.LogEntry(ctx).Errorf("[{{.projectName}}] Mongo Insert One Error: %v", err.Error())
+		logger.LogEntry(ctx).Errorf("[{{.ProjectName}}] Mongo Insert One Error: %v", err.Error())
 		return
 	}
 
@@ -69,7 +69,7 @@ func (m *Model) InsertOne(ctx context.Context, collection string, data interface
 func (m *Model) UpdateOne(ctx context.Context, collection string, data map[string]interface{}, filter map[string]interface{}) (id primitive.ObjectID, err error) {
 	res, err := MongoDB.Collection(collection).UpdateOne(ctx, filter, data)
 	if err != nil {
-		logger.LogEntry(ctx).Errorf("[{{.projectName}}] Mongo Update One Error: %v", err.Error())
+		logger.LogEntry(ctx).Errorf("[{{.ProjectName}}] Mongo Update One Error: %v", err.Error())
 		return
 	}
 
