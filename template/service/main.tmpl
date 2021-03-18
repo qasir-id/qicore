@@ -1,0 +1,10 @@
+package main
+
+import (
+	"{{.projectName}}/transport/grpc"
+	_ "gitlab.com/qasir/web/project/qasircore.git"
+)
+
+func main() {
+	grpc.Run()
+}

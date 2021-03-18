@@ -1,0 +1,62 @@
+package util
+
+import (
+	"gitlab.com/qasir/web/project/qasircore.git/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+
+// NotFoundError is for something that not found
+func NotFoundError(model string) error {
+	return status.Errorf(codes.NotFound, "The "+model+" resounce not found")
+}
+
+func ErrProcess(msg string) error {
+	return status.Errorf(codes.ProcessingError, msg)
+}
+
+// UpdateError indicates that the update is failed and need to be fixed
+func UpdateError() error {
+	return status.Errorf(codes.InvalidArgument, "Update failed")
+}
+
+// CreateError indicates that the create is failed and need to be fixed
+func CreateError() error {
+	return status.Errorf(codes.InvalidArgument, "Create failed")
+}
+
+// ProcessingError indicates that the create is custome failed message
+func ProcessingError(message string) error {
+	return status.Errorf(codes.InvalidArgument, message)
+}
+
+// DuplicateTransaction indicates that transcation already exist
+func DuplicateTransaction() error {
+	return status.Errorf(codes.DuplicateTransaction, "Duplicate Transaction")
+}
+
+// TransactionDeclined indicates that transaction is declined by user
+func TransactionDeclined() error {
+	return status.Errorf(codes.InvalidArgument, "Transaction Declined")
+}
+
+// TimeoutRequest indicates the request exceeds the time limit
+func TimeoutRequest() error {
+	return status.Errorf(codes.RequestTimeout, "Timeout Request")
+}
+
+// AlreadySuccess indicates that transaction is already success
+func AlreadySuccess() error {
+	return status.Errorf(codes.InvalidTransaction, "Transaction already success")
+}
+
+// InternalError error
+func InternalError(message string, a ...interface{}) error {
+	return status.Errorf(codes.InternalError, message, a)
+}
+
+
+// ErrBadRequest indicates that request has an invalid parameter
+func ErrBadRequest(msg string) error {
+	return status.Errorf(codes.InvalidArgument, msg)
+}

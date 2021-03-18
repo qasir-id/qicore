@@ -1,0 +1,79 @@
+package mongo
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"os"
+	"time"
+
+	"go.elastic.co/apm/module/apmmongo"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+var MongoDB *mongo.Database
+
+// InitCon handler connection for mongodb
+func InitCon() {
+	var urlConnection string
+
+	mongoCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	urlConnection = devConnectionScript()
+	if fmt.Sprint(os.Getenv("APP_ENV")) == "production" || fmt.Sprint(os.Getenv("APP_ENV")) == "prod" {
+		urlConnection = prodConnectionScript()
+	}
+
+	db, err := mongo.Connect(
+		mongoCtx,
+		options.Client().ApplyURI(urlConnection),
+		options.Client().SetMonitor(apmmongo.CommandMonitor()),
+		options.Client().SetMaxPoolSize(30),
+	)
+	if err != nil {
+		log.Fatal("Could not connect to MongoDB: ", err)
+	}
+
+	// Check the connection
+	err = db.Ping(mongoCtx, nil)
+	if err != nil {
+		log.Fatal("Could not connect to MongoDB Server: ", err)
+	}
+
+	fmt.Printf("⇨ %s Data source %s:%s , Successfully connected! \n", os.Getenv("DB_DRIVER"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"))
+
+	MongoDB = db.Database(fmt.Sprint(os.Getenv("DB_DATABASE")))
+}
+
+func devConnectionScript() string {
+	hostName := fmt.Sprint(os.Getenv("DB_HOST")) + ":" + fmt.Sprint(os.Getenv("DB_PORT"))
+
+	fmt.Printf("⇨ Connect MongoDB to Server %s ... \n", hostName)
+
+	usernameAndPassword := ""
+	if fmt.Sprint(os.Getenv("DB_USER")) != "" {
+		usernameAndPassword = fmt.Sprint(os.Getenv("DB_USER")) + ":" + fmt.Sprint(os.Getenv("DB_PASSWORD")) + "@"
+	}
+	// auth source database for mongodb connection, if empty it would be default as `admin`
+	authSource := ""
+	if fmt.Sprint(os.Getenv("DB_AUTH")) != "" {
+		authSource = "/?authSource=" + fmt.Sprint(os.Getenv("DB_AUTH"))
+	}
+	return fmt.Sprint(os.Getenv("DB_DRIVER")) + "://" + usernameAndPassword + hostName + authSource
+
+}
+
+func prodConnectionScript() string {
+	hostName := fmt.Sprint(os.Getenv("DB_HOST")) + "/" + fmt.Sprint(os.Getenv("DB_DATABASE"))
+
+	fmt.Printf("⇨ Connect MongoDB to Server %s ... \n", hostName)
+
+	usernameAndPassword := ""
+	if fmt.Sprint(os.Getenv("DB_USER")) != "" {
+		usernameAndPassword = fmt.Sprint(os.Getenv("DB_USER")) + ":" + fmt.Sprint(os.Getenv("DB_PASSWORD")) + "@"
+	}
+
+	return fmt.Sprint(os.Getenv("DB_DRIVER")) + "+srv://" + usernameAndPassword + hostName
+}
