@@ -4,54 +4,33 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/qasir-id/qicore/scaffold"
-
-	s "github.com/catchplay/scaffold/scaffold"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
 	app := cli.NewApp()
 	app.Version = "1.0.0-rc"
-	app.Usage = "Generate scaffold project layout for Go."
-	app.Commands = []cli.Command{
+	app.Usage = "Generate scaffold project layout for Qasir Team"
+	app.Commands = []*cli.Command{
 		{
-			Name:    "init",
+			Name:    "qsr-service",
 			Aliases: []string{"i"},
-			Usage:   " Generate scaffold project layout",
-			Action: func(c *cli.Context) error {
-				currDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-				if err != nil {
-					return err
-				}
-
-				err = s.New(false).Generate(currDir)
-				//fmt.Printf("error:%+v\n", err)
-				if err == nil {
-					fmt.Println("Success Created. Please excute `make up` to start service.")
-				}
-
-				return err
+			Usage:   " qsr-service -n 'pos-service-account'",
+			Flags: []cli.Flag{
+				&cli.StringFlag{Name: "name", Aliases: []string{"n"}},
 			},
-		},
-		{
-			Name:    "qasir",
-			Aliases: []string{"i"},
-			Usage:   " Generate scaffold project layout",
 			Action: func(c *cli.Context) error {
-				currDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-				if err != nil {
-					return err
-				}
-
-				err = scaffold.New(true).Generate(currDir)
-				//fmt.Printf("error:%+v\n", err)
+				fmt.Println("service name : ", c.String("name"))
+				currDir, _ := os.Getwd()
+				err := scaffold.New(false).Generate(scaffold.DataFlag{
+					Path: currDir,
+					Name: c.String("name"),
+				})
 				if err == nil {
 					fmt.Println("Success Created. Please excute `make up` to start service.")
 				}
-
 				return err
 			},
 		},
