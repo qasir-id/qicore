@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	GoScaffoldPath = ""
+	GoScaffoldPath = "src/github.com/qasir-id/qicore"
 )
 
 func init() {
@@ -22,7 +22,11 @@ func init() {
 	}
 }
 
-var Gopath string
+var (
+	Gopath        string
+	ProjectName   string
+	SubStrService string
+)
 
 type scaffold struct {
 	debug bool
@@ -47,8 +51,9 @@ type templateSet struct {
 }
 
 type DataFlag struct {
-	Path string
-	Name string
+	Path          string
+	Name          string
+	SubStrService string
 }
 
 func New(debug bool) *scaffold {
@@ -60,14 +65,14 @@ func (s *scaffold) Generate(dataFlag DataFlag) error {
 	if err != nil {
 		return err
 	}
-	projectName := filepath.Base(genAbsDir)
 	//TODO: have to check path MUST be under the $GOPATH/src folder
 	goProjectPath := strings.TrimPrefix(genAbsDir, filepath.Join(Gopath, "src")+string(os.PathSeparator))
-	projectName = dataFlag.Name
+	ProjectName = dataFlag.Name
+	SubStrService = dataFlag.SubStrService
 	d := data{
 		AbsGenProjectPath: genAbsDir,
 		ProjectPath:       goProjectPath,
-		ProjectName:       projectName,
+		ProjectName:       ProjectName,
 		Quit:              "<-quit",
 	}
 
@@ -81,13 +86,14 @@ func (s *scaffold) Generate(dataFlag DataFlag) error {
 
 func getTemplateSets() []templateSet {
 	tt := templateEngine{}
-	path, err := os.Getwd()
-	if err != nil {
-		log.Println(err)
-	}
-	templatesFolder := path + "/template/service/"
+	//path, err := os.Getwd()
+	//if err != nil {
+	//	log.Println(err)
+	//}
+	//templatesFolder := path + "/template/service/"
+	templatesFolder := filepath.Join(Gopath, GoScaffoldPath, "/template/service/")
 
-	if err = filepath.Walk(templatesFolder, tt.visit); err != nil {
+	if err := filepath.Walk(templatesFolder, tt.visit); err != nil {
 		log.Println("error get Template", err)
 	}
 
@@ -138,32 +144,44 @@ func (templEngine *templateEngine) visit(path string, f os.FileInfo, err error) 
 	if err != nil {
 		return err
 	}
+	projectName := ProjectName + "/"
 	if ext := filepath.Ext(path); ext == ".tmpl" { // for handle file format tmpl
 		templateFileName := filepath.Base(path)
 		genFileBaeName := strings.TrimSuffix(templateFileName, ".tmpl") + ".go"
-		genFileBasePath, err := filepath.Rel(filepath.Join(Gopath, GoScaffoldPath, "template"), filepath.Join(filepath.Dir(path), genFileBaeName))
-		if err != nil {
-			return pkgErr.WithStack(err)
+		genFileBasePath := filepath.Join(filepath.Dir(path), genFileBaeName)
+
+		subStr := strings.Index(filepath.Dir(path), "service")
+		dirTemp := ""
+		if subStr > -1 {
+			dirTemp = genFileBasePath[subStr+7:]
 		}
+
+		projectName += dirTemp
 		templ := templateSet{
 			templateFilePath: path,
 			templateFileName: templateFileName,
-			genFilePath:      genFileBasePath,
+			genFilePath:      projectName,
 		}
 		templEngine.Templates = append(templEngine.Templates, templ)
 
 	} else if mode := f.Mode(); mode.IsRegular() { // for handle file format except tmpl
 		templateFileName := filepath.Base(path)
-		basepath := filepath.Join(Gopath, GoScaffoldPath, "template")
-		targpath := filepath.Join(filepath.Dir(path), templateFileName)
-		genFileBasePath, err := filepath.Rel(basepath, targpath)
+		basePath := filepath.Join(Gopath, GoScaffoldPath, "template")
+		targPath := filepath.Join(filepath.Dir(path), templateFileName)
+		genFileBasePath, err := filepath.Rel(basePath, targPath)
 		if err != nil {
 			return pkgErr.WithStack(err)
 		}
+		subStr := strings.Index(filepath.Dir(path), "service/")
+		dirTemp := ""
+		if subStr > -1 {
+			dirTemp = genFileBasePath[subStr+7:]
+		}
+		projectName += dirTemp + "/" + templateFileName
 		templ := templateSet{
 			templateFilePath: path,
 			templateFileName: templateFileName,
-			genFilePath:      filepath.Join(templEngine.currDir, genFileBasePath),
+			genFilePath:      projectName,
 		}
 
 		templEngine.Templates = append(templEngine.Templates, templ)

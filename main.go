@@ -25,11 +25,12 @@ func main() {
 				fmt.Println("service name : ", c.String("name"))
 				currDir, _ := os.Getwd()
 				err := scaffold.New(false).Generate(scaffold.DataFlag{
-					Path: currDir,
-					Name: c.String("name"),
+					Path:          currDir,
+					Name:          c.String("name"),
+					SubStrService: "service",
 				})
 				if err == nil {
-					fmt.Println("Success Created. Please excute `make up` to start service.")
+					fmt.Println("Success Created. Please excute `go run main.go` to start service.")
 				}
 				return err
 			},
