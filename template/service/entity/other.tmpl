@@ -1,0 +1,6 @@
+package entity
+
+type PubSubMessage struct {
+	Action string      // action message ex: category:create or category:delete etc
+	Data   interface{} // data for processing action
+}

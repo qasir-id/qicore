@@ -1,0 +1,11 @@
+package pubsub
+
+import (
+	"context"
+)
+
+type HandlerService interface {
+	Handle(context.Context, map[string]string, []byte) (error)
+}
+
+var ServiceMapping = map[string]HandlerService{}

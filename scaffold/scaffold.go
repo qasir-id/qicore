@@ -86,12 +86,15 @@ func (s *scaffold) Generate(dataFlag DataFlag) error {
 
 func getTemplateSets() []templateSet {
 	tt := templateEngine{}
-	//path, err := os.Getwd()
-	//if err != nil {
-	//	log.Println(err)
-	//}
-	//templatesFolder := path + "/template/service/"
+
 	templatesFolder := filepath.Join(Gopath, GoScaffoldPath, "/template/service/")
+	if os.Getenv("APP_MODE") == "develop" {
+		path, err := os.Getwd()
+		if err != nil {
+			log.Println(err)
+		}
+		templatesFolder = path + "/template/service/"
+	}
 
 	if err := filepath.Walk(templatesFolder, tt.visit); err != nil {
 		log.Println("error get Template", err)
@@ -122,7 +125,6 @@ func (s *scaffold) tmplExec(tmplSet templateSet, d data) error {
 
 	distRelFilePath := filepath.Join(relateDir, filepath.Base(tmplSet.genFilePath))
 	distAbsFilePath := filepath.Join(d.AbsGenProjectPath, distRelFilePath)
-
 	s.debugPrintf("distRelFilePath:%s\n", distRelFilePath)
 	s.debugPrintf("distAbsFilePath:%s\n", distAbsFilePath)
 	if err := os.MkdirAll(filepath.Dir(distAbsFilePath), os.ModePerm); err != nil {

@@ -1,10 +1,15 @@
 package util
 
 import (
-
-	jsoniter "github.com/json-iterator/go"
+     "context"
+    	jsoniter "github.com/json-iterator/go"
+    	"github.com/qasir-id/qistream/service/pubsub"
 )
 
 var (
 	Json          = jsoniter.ConfigCompatibleWithStandardLibrary
 )
+
+func PublishTopic(ctx context.Context,byte ][]byte,topicName string){
+	pubsub.PublishTopic(ctx, byte, topicName)
+}

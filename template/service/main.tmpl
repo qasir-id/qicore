@@ -1,10 +1,14 @@
 package main
 
 import (
+    "log"
 	"{{.ProjectName}}/transport/grpc"
 	_ "gitlab.com/qasir/web/project/qasircore.git"
 )
 
 func main() {
-	grpc.Run()
+    log.Println("service up")
+//	grpc.Run()
+//	go grpc.Run()
+//    pubsub.NewPubSubService(nil).Run()
 }

@@ -42,38 +42,38 @@ func InitCon() {
 		log.Fatal("Could not connect to MongoDB Server: ", err)
 	}
 
-	fmt.Printf("⇨ %s Data source %s:%s , Successfully connected! \n", os.Getenv("DB_DRIVER"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"))
+	fmt.Printf("⇨ %s Data source %s:%s , Successfully connected! \n", os.Getenv("DB_MONGO_DRIVER"), os.Getenv("DB_MONGO_HOST"), os.Getenv("DB_MONGO_PORT"))
 
-	MongoDB = db.Database(fmt.Sprint(os.Getenv("DB_DATABASE")))
+	MongoDB = db.Database(fmt.Sprint(os.Getenv("DB_MONGO_DATABASE")))
 }
 
 func devConnectionScript() string {
-	hostName := fmt.Sprint(os.Getenv("DB_HOST")) + ":" + fmt.Sprint(os.Getenv("DB_PORT"))
+	hostName := fmt.Sprint(os.Getenv("DB_MONGO_HOST")) + ":" + fmt.Sprint(os.Getenv("DB_MONGO_PORT"))
 
 	fmt.Printf("⇨ Connect MongoDB to Server %s ... \n", hostName)
 
 	usernameAndPassword := ""
-	if fmt.Sprint(os.Getenv("DB_USER")) != "" {
-		usernameAndPassword = fmt.Sprint(os.Getenv("DB_USER")) + ":" + fmt.Sprint(os.Getenv("DB_PASSWORD")) + "@"
+	if fmt.Sprint(os.Getenv("DB_MONGO_USER")) != "" {
+		usernameAndPassword = fmt.Sprint(os.Getenv("DB_MONGO_USER")) + ":" + fmt.Sprint(os.Getenv("DB_MONGO_PASSWORD")) + "@"
 	}
 	// auth source database for mongodb connection, if empty it would be default as `admin`
 	authSource := ""
-	if fmt.Sprint(os.Getenv("DB_AUTH")) != "" {
-		authSource = "/?authSource=" + fmt.Sprint(os.Getenv("DB_AUTH"))
+	if fmt.Sprint(os.Getenv("DB_MONGO_AUTH")) != "" {
+		authSource = "/?authSource=" + fmt.Sprint(os.Getenv("DB_MONGO_AUTH"))
 	}
-	return fmt.Sprint(os.Getenv("DB_DRIVER")) + "://" + usernameAndPassword + hostName + authSource
+	return fmt.Sprint(os.Getenv("DB_MONGO_DRIVER")) + "://" + usernameAndPassword + hostName + authSource
 
 }
 
 func prodConnectionScript() string {
-	hostName := fmt.Sprint(os.Getenv("DB_HOST")) + "/" + fmt.Sprint(os.Getenv("DB_DATABASE"))
+	hostName := fmt.Sprint(os.Getenv("DB_MONGO_HOST")) + "/" + fmt.Sprint(os.Getenv("DB_MONGO_DATABASE"))
 
 	fmt.Printf("⇨ Connect MongoDB to Server %s ... \n", hostName)
 
 	usernameAndPassword := ""
-	if fmt.Sprint(os.Getenv("DB_USER")) != "" {
-		usernameAndPassword = fmt.Sprint(os.Getenv("DB_USER")) + ":" + fmt.Sprint(os.Getenv("DB_PASSWORD")) + "@"
+	if fmt.Sprint(os.Getenv("DB_MONGO_USER")) != "" {
+		usernameAndPassword = fmt.Sprint(os.Getenv("DB_MONGO_USER")) + ":" + fmt.Sprint(os.Getenv("DB_MONGO_PASSWORD")) + "@"
 	}
 
-	return fmt.Sprint(os.Getenv("DB_DRIVER")) + "+srv://" + usernameAndPassword + hostName
+	return fmt.Sprint(os.Getenv("DB_MONGO_DRIVER")) + "+srv://" + usernameAndPassword + hostName
 }

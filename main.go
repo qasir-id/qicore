@@ -5,11 +5,14 @@ import (
 	"log"
 	"os"
 
+	"github.com/joho/godotenv"
+
 	"github.com/qasir-id/qicore/scaffold"
 	"github.com/urfave/cli/v2"
 )
 
 func main() {
+	_ = godotenv.Load()
 	app := cli.NewApp()
 	app.Version = "1.0.0-rc"
 	app.Usage = "Generate scaffold project layout for Qasir Team"
@@ -17,7 +20,7 @@ func main() {
 		{
 			Name:    "qsr-service",
 			Aliases: []string{"i"},
-			Usage:   " qsr-service -n 'pos-service-account'",
+			Usage:   " qsr-service -n 'service name'",
 			Flags: []cli.Flag{
 				&cli.StringFlag{Name: "name", Aliases: []string{"n"}},
 			},
