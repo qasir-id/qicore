@@ -20,7 +20,7 @@ func main() {
 		{
 			Name:    "qsr-service",
 			Aliases: []string{"i"},
-			Usage:   " qsr-service -n 'service name'",
+			Usage:   "qsr-service -n 'service name'",
 			Flags: []cli.Flag{
 				&cli.StringFlag{Name: "name", Aliases: []string{"n"}},
 			},
@@ -31,6 +31,26 @@ func main() {
 					Path:          currDir,
 					Name:          c.String("name"),
 					SubStrService: "service",
+				})
+				if err == nil {
+					fmt.Println("Success Created. Please excute `go run main.go` to start service.")
+				}
+				return err
+			},
+		}, {
+			Name:    "qsr-gateway",
+			Aliases: []string{"i"},
+			Usage:   "qsr-gateway -n 'gateway name'",
+			Flags: []cli.Flag{
+				&cli.StringFlag{Name: "name", Aliases: []string{"n"}},
+			},
+			Action: func(c *cli.Context) error {
+				fmt.Println("gateway name : ", c.String("name"))
+				currDir, _ := os.Getwd()
+				err := scaffold.New(false).Generate(scaffold.DataFlag{
+					Path:          currDir,
+					Name:          c.String("name"),
+					SubStrService: "gateway",
 				})
 				if err == nil {
 					fmt.Println("Success Created. Please excute `go run main.go` to start service.")

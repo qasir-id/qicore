@@ -1,0 +1,40 @@
+package postgre
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"time"
+
+	"github.com/jmoiron/sqlx"
+	"{{.ProjectName}}/util"
+	"go.elastic.co/apm/module/apmsql"
+	_ "go.elastic.co/apm/module/apmsql/pq"
+)
+
+//PostgreDB struct sqlx
+var PostgreDB *sqlx.DB
+
+func InitPostgreDBCon() {
+	user := fmt.Sprint(os.Getenv("POSTGRE_DB_USER"))
+	password := fmt.Sprint(os.Getenv("POSTGRE_DB_PASSWORD"))
+	host := fmt.Sprint(os.Getenv("POSTGRE_DB_HOST"))
+	port := fmt.Sprint(os.Getenv("POSTGRE_DB_PORT"))
+	dbName := fmt.Sprint(os.Getenv("POSTGRE_DB_DATABASE"))
+
+	urlConnection := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable ", host, port, user, password, dbName)
+
+	driverName := os.Getenv("POSTGRE_DB_DRIVER")
+	db, err := apmsql.Open(driverName, urlConnection)
+	if err != nil {
+		log.Fatalf("⇨ %s Data source %s:%s , Failed : %s \n", driverName, host, port, err.Error())
+	}
+
+	db.SetMaxOpenConns(util.StringToInt(os.Getenv("POSTGRE_DB_MAX_CONN")))
+	db.SetMaxIdleConns(util.StringToInt(os.Getenv("POSTGRE_DB_MAX_IDLE_CONN")))
+	db.SetConnMaxLifetime(5 * time.Minute)
+
+	fmt.Printf("⇨ %s Data source %s:%s , Successfully connected! \n", driverName, host, port)
+
+	PostgreDB = sqlx.NewDb(db, driverName)
+}

@@ -87,13 +87,14 @@ func (s *scaffold) Generate(dataFlag DataFlag) error {
 func getTemplateSets() []templateSet {
 	tt := templateEngine{}
 
-	templatesFolder := filepath.Join(Gopath, GoScaffoldPath, "/template/service/")
+	templateService := "/template/" + SubStrService + "/"
+	templatesFolder := filepath.Join(Gopath, GoScaffoldPath, templateService)
 	if os.Getenv("APP_MODE") == "develop" {
 		path, err := os.Getwd()
 		if err != nil {
 			log.Println(err)
 		}
-		templatesFolder = path + "/template/service/"
+		templatesFolder = path + templateService
 	}
 
 	if err := filepath.Walk(templatesFolder, tt.visit); err != nil {
@@ -152,7 +153,7 @@ func (templEngine *templateEngine) visit(path string, f os.FileInfo, err error) 
 		genFileBaeName := strings.TrimSuffix(templateFileName, ".tmpl") + ".go"
 		genFileBasePath := filepath.Join(filepath.Dir(path), genFileBaeName)
 
-		subStr := strings.Index(filepath.Dir(path), "service")
+		subStr := strings.Index(filepath.Dir(path), SubStrService)
 		dirTemp := ""
 		if subStr > -1 {
 			dirTemp = genFileBasePath[subStr+7:]
@@ -174,7 +175,7 @@ func (templEngine *templateEngine) visit(path string, f os.FileInfo, err error) 
 		if err != nil {
 			return pkgErr.WithStack(err)
 		}
-		subStr := strings.Index(filepath.Dir(path), "service/")
+		subStr := strings.Index(filepath.Dir(path), SubStrService+"/")
 		dirTemp := ""
 		if subStr > -1 {
 			dirTemp = genFileBasePath[subStr+7:]

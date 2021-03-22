@@ -1,0 +1,17 @@
+package postgre
+
+import (
+	"context"
+
+	"github.com/jmoiron/sqlx"
+	"{{.ProjectName}}/util"
+)
+
+type PostgreInterface interface {
+	List(context.Context, *sqlx.DB, interface{}, *util.Query, string) error
+	Get(context.Context, *sqlx.DB, interface{}, *util.Query, string) error
+	GetTransaction(context.Context, *sqlx.Tx, interface{}, *util.Query, string) error
+	CreateUpdate(context.Context, *sqlx.DB, interface{}, string) error
+	CreateUpdateTransaction(context.Context, *sqlx.Tx, interface{}, string) error
+	ListWithPagination(context.Context, *sqlx.DB, interface{}, *util.Pagination, *util.Query, string, string) (*util.Pagination, error)
+}

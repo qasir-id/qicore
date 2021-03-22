@@ -1,0 +1,86 @@
+package postgre
+
+import (
+	"context"
+
+	"github.com/jmoiron/sqlx"
+	"{{.ProjectName}}/util"
+)
+
+
+type Model struct{}
+
+
+func NewModel() *Model {
+	return &Model{}
+}
+
+func (c *Model) List(ctx context.Context, db *sqlx.DB, data interface{}, query *util.Query, queryString string) (err error) {
+	where, args := query.Where()
+	q := queryString
+	q += where
+
+	if err = db.SelectContext(ctx, data, db.Rebind(q), args...); err != nil {
+		return
+	}
+	return
+}
+
+func (c *Model) Get(ctx context.Context, db *sqlx.DB, data interface{}, query *util.Query, queryString string) (err error) {
+	where, args := query.Where()
+	q := queryString
+	q += where
+
+	if err = db.GetContext(ctx, data, db.Rebind(q), args...); err != nil {
+		return
+	}
+	return
+}
+
+func (r *Model) CreateUpdate(ctx context.Context, db *sqlx.DB, data interface{}, queryString string) (err error) {
+	_, err = db.NamedExecContext(ctx, queryString, data)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (r *Model) ListWithPagination(ctx context.Context, db *sqlx.DB, data interface{}, pagination *util.Pagination, query *util.Query, queryString string, queryCount string) (paginate *util.Pagination, err error) {
+	where, args := query.Where()
+	sort := query.Order()
+	limit := pagination.LimitOffset()
+	q := queryString
+	q += where
+	q += sort
+	q += limit
+
+	if err = db.SelectContext(ctx, data, db.Rebind(q), args...); err != nil {
+		return
+	}
+	var count int32
+	err = r.Get(ctx, db, &count, query, queryCount)
+	if err != nil {
+		return
+	}
+	paginate = pagination.SetTotalPage(count)
+	return
+}
+
+func (r *Model) CreateUpdateTransaction(ctx context.Context, tx *sqlx.Tx, data interface{}, queryString string) (err error) {
+	_, err = tx.NamedExecContext(ctx, queryString, data)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (c *Model) GetTransaction(ctx context.Context, tx *sqlx.Tx, data interface{}, query *util.Query, queryString string) (err error) {
+	where, args := query.Where()
+	q := queryString
+	q += where
+
+	if err = tx.GetContext(ctx, data, tx.Rebind(q), args...); err != nil {
+		return
+	}
+	return
+}

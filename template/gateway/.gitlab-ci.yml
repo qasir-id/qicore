@@ -1,0 +1,18 @@
+image:
+  name: sonarsource/sonar-scanner-cli:latest
+variables:
+  SONAR_TOKEN: "${SONARQUBE_TOKEN_ADMIN}"
+  SONAR_HOST_URL: "${SONARQUBE_HOST_URL}"
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Defines the location of the analysis task cache
+  GIT_DEPTH: 0 # Tells git to fetch all the branches of the project, required by the analysis task
+cache:
+  key: ${CI_JOB_NAME}
+  paths:
+    - .sonar/cache
+sonarqube-check:
+  stage: test
+  script:
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=${CI_PROJECT_NAMESPACE}:${CI_PROJECT_NAME} -Dsonar.sources=${CI_PROJECT_DIR} -Dsonar.projectVersion=${CI_COMMIT_SHORT_SHA}
+  allow_failure: true
+  only:
+    - master
