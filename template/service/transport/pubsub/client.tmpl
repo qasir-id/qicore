@@ -1,0 +1,62 @@
+package pubsub
+
+import (
+	"context"
+	"encoding/base64"
+	"fmt"
+	"log"
+	"runtime"
+	"time"
+
+	"cloud.google.com/go/pubsub"
+	"github.com/kelseyhightower/envconfig"
+	"google.golang.org/api/option"
+)
+
+type Env struct {
+	ProjectID                    string        `envconfig:"GCP_PROJECT_ID" required:"true"`
+	Credentials                  string        `envconfig:"GCP_CREDENTIALS" required:"true"`
+	TopicPosInventory            string        `envconfig:"GCP_TOPIC_POS_INVENTORY" required:"true"`
+	TopicPosInventoryDataVersion string        `envconfig:"GCP_TOPIC_POS_INVENTORY_DATAVERSION" required:"true"`
+	TopicFirebase                string        `envconfig:"GCP_TOPIC_FIREBASE" required:"true"`
+	SubPosInventory              string        `envconfig:"GCP_SUB_POS_INVENTORY" required:"true"`
+	SubPosInventoryDataVersion   string        `envconfig:"GCP_SUB_POS_INVENTORY_DATAVERSION" required:"true"`
+	HandlerDeadline              time.Duration `envconfig:"GCP_HANDLER_DEADLINE" default:"2s"`
+	MaxExtension                 time.Duration `envconfig:"GCP_MAX_EXTENSION" default:"60s"`
+	MaxOutstandingMessages       int           `envconfig:"GCP_MAX_OUTSTANDING_MESSAGES" default:"-1"`
+	MaxOutstandingBytes          int           `envconfig:"GCP_MAX_OUTSTANDING_BYTES" default:"-1"`
+	NumGoroutines                int           `envconfig:"GCP_NUM_GOROUTINES"`
+	AckDeadline                  time.Duration `envconfig:"GCP_ACK_DEADLINE" default:"60s"`
+	Synchronous                  bool          `envconfig:"GCP_SYNCHRONOUS" default:"false"`
+	MaxRetry                     int           `envconfig:"GCP_MAX_RETRY" default:"3"`
+}
+
+var Config *Env
+
+func NewClient(conf *Env) *pubsub.Client {
+	// open config
+	Config = LoadFromEnv()
+	b, err := base64.StdEncoding.WithPadding(base64.NoPadding).DecodeString(Config.Credentials)
+	if err != nil {
+		log.Fatalf("failed load credential config : %v", err)
+	}
+	// new client
+	ctx := context.Background()
+	psClient, err := pubsub.NewClient(ctx, Config.ProjectID, option.WithCredentialsJSON(b))
+	if err != nil {
+		log.Fatalf("failed to connect Pubsub Client : %v", err)
+	}
+	fmt.Printf("⇨ Pub/Sub Client Started !! \n")
+	return psClient
+}
+
+func LoadFromEnv() *Env {
+	var env Env
+	if err := envconfig.Process("GCP", &env); err != nil {
+		log.Fatalf("⇨ %s failed to parsing env : %s \n", "Pub/Sub", err.Error())
+	}
+	if env.NumGoroutines == 0 {
+		env.NumGoroutines = runtime.NumCPU()
+	}
+	return &env
+}

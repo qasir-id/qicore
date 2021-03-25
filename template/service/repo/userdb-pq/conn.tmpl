@@ -1,0 +1,37 @@
+package userdb-pq
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"time"
+
+	"github.com/jmoiron/sqlx"
+	"{{.ProjectName}}/util"
+	"gitlab.com/qasir/web/project/qasircore.git/database"
+)
+
+var DB *sqlx.DB
+
+func OpenDB() {
+	urlConnection := "user=" + fmt.Sprint(os.Getenv("INVENTORY_DB_USER")) + " "
+	if os.Getenv("INVENTORY_DB_PASSWORD") != "" {
+		urlConnection += "password=" + fmt.Sprint(os.Getenv("INVENTORY_DB_PASSWORD")) + " "
+	}
+	urlConnection += "host=" + fmt.Sprint(os.Getenv("INVENTORY_DB_HOST")) + " "
+	urlConnection += "port=" + fmt.Sprint(os.Getenv("INVENTORY_DB_PORT")) + " "
+	urlConnection += "dbname=" + fmt.Sprint(os.Getenv("INVENTORY_DB_DATABASE")) + " "
+	urlConnection += "sslmode=disable"
+
+	db, err := database.OpenDBx(os.Getenv("INVENTORY_DB_DRIVER"), urlConnection)
+	if err != nil {
+		log.Panicf("⇨ %s Data source %s , Failed : %s \n", os.Getenv("INVENTORY_DB_DRIVER"), os.Getenv("INVENTORY_DB_DATABASE"), err.Error())
+	}
+
+	db.SetMaxOpenConns(int(util.AtoI64(os.Getenv("INVENTORY_DB_MAX_CONN"))))
+	db.SetMaxIdleConns(int(util.AtoI64(os.Getenv("INVENTORY_DB_MAX_IDLE_CONN"))))
+	db.SetConnMaxLifetime(5 * time.Minute)
+
+	log.Printf("⇨ %s Data source %s  \n", os.Getenv("INVENTORY_DB_DRIVER"), os.Getenv("INVENTORY_DB_DATABASE"))
+	DB = db
+}

@@ -34,8 +34,8 @@ type scaffold struct {
 
 type data struct {
 	AbsGenProjectPath string // The Abs Gen Project Path
-	ProjectPath       string //The Go import project path (eg:github.com/fooOrg/foo)
-	ProjectName       string //The project name which want to generated
+	ProjectPath       string // The Go import project path (eg:github.com/fooOrg/foo)
+	ProjectName       string // The project name which want to generated
 	Quit              string
 }
 
@@ -65,7 +65,7 @@ func (s *scaffold) Generate(dataFlag DataFlag) error {
 	if err != nil {
 		return err
 	}
-	//TODO: have to check path MUST be under the $GOPATH/src folder
+	// TODO: have to check path MUST be under the $GOPATH/src folder
 	goProjectPath := strings.TrimPrefix(genAbsDir, filepath.Join(Gopath, "src")+string(os.PathSeparator))
 	ProjectName = dataFlag.Name
 	SubStrService = dataFlag.SubStrService

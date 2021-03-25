@@ -1,0 +1,25 @@
+package userdb-mysql
+
+import (
+	"fmt"
+	"log"
+	"os"
+
+	"github.com/jmoiron/sqlx"
+	"gitlab.com/qasir/web/project/qasircore.git/database"
+)
+
+var DB *sqlx.DB
+
+func OpenDB() {
+	usernameAndPassword := fmt.Sprint(os.Getenv("USER_DB_USER")) + ":" + fmt.Sprint(os.Getenv("USER_DB_PASSWORD"))
+	// usernameAndPassword := fmt.Sprint(os.Getenv("USER_DB_USER")) + ":" + "!q2W_@Lf4n_#E4r_Qa51r"
+	hostName := "tcp(" + fmt.Sprint(os.Getenv("USER_DB_HOST")) + ":" + fmt.Sprint(os.Getenv("USER_DB_PORT")) + ")"
+	urlConnection := usernameAndPassword + "@" + hostName + "/" + fmt.Sprint(os.Getenv("USER_DB_DATABASE")) + "?charset=utf8&parseTime=true&loc=UTC"
+
+	db, err := database.OpenDBx(os.Getenv("USER_DB_DRIVER"), urlConnection)
+	if err != nil {
+		log.Panicf("⇨ %s Data source %s , Failed : %s \n", os.Getenv("USER_DB_DRIVER"), urlConnection, err.Error())
+	}
+	DB = db
+}

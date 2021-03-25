@@ -1,42 +1,29 @@
 package grpc
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"os"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	"gitlab.com/qasir/web/project/qasircore.git/grpc/middleware/validator"
-	"go.elastic.co/apm/module/apmgrpc"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/health"
-	healthpb "google.golang.org/grpc/health/grpc_health_v1"
+	"{{.ProjectName}}/transport/grpc/proto/contract"
+	qGrpc "gitlab.com/qasir/web/project/qasircore.git/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
-// Run handler running grpc
 func Run() {
 	lis, err := net.Listen("tcp", ":"+os.Getenv("GRPC_PORT"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	} else {
-		fmt.Printf("⇨ Connect GRPC to port : %s \n", os.Getenv("GRPC_PORT"))
+		log.Println("Connect GRPC to port " + os.Getenv("GRPC_PORT"))
 	}
-
-	s := grpc.NewServer(grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-		apmgrpc.NewUnaryServerInterceptor(apmgrpc.WithRecovery()),
-		validator.UnaryServerInterceptor(),
-	)))
-
-	hsrv := health.NewServer()
-	hsrv.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
-	healthpb.RegisterHealthServer(s, hsrv)
-    //insert register pb service
-
+	log.Println("Connect To Register Product Server")
+	s := qGrpc.NewServer()
+	contract.RegisterContractServiceServer(s, NewContractServer())
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+
 }

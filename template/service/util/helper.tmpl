@@ -1,26 +1,31 @@
 package util
 
 import (
-     "context"
-       	"strconv"
-    	jsoniter "github.com/json-iterator/go"
-    	"github.com/qasir-id/qistream/service/pubsub"
+     "encoding/json"
+     "strconv"
 )
 
-var (
-	Json          = jsoniter.ConfigCompatibleWithStandardLibrary
-)
-
-func PublishTopic(ctx context.Context,byte ][]byte,topicName string){
-	pubsub.PublishTopic(ctx, byte, topicName)
-}
-
-func StringToInt(s string) int {
+func AtoI(s string) int {
 	i, _ := strconv.Atoi(s)
 	return i
 }
 
-func StringToInt64(s string) int64 {
+func AtoI64(s string) int64 {
 	i, _ := strconv.ParseInt(s, 10, 64)
 	return i
+}
+
+
+
+type MessageData struct {
+	Action string      `json:"action"`
+	Data   interface{} `json:"data"`
+}
+
+func DecodeMessageData(b []byte, i interface{}) error {
+	md := &MessageData{Data: i}
+	if err := json.Unmarshal(b, &md); err != nil {
+		return err
+	}
+	return nil
 }
