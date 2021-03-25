@@ -1,4 +1,4 @@
-package userdb-mongo
+package userdb_mongo
 
 import (
 	"context"
@@ -19,7 +19,7 @@ func OpenDB() {
 	if fmt.Sprint(os.Getenv("APP_ENV")) == "production" || fmt.Sprint(os.Getenv("APP_ENV")) == "prod" {
 		urlConnection = prodConnectionScript()
 	}
-	MongoDB = mongo.OpenDB(urlConnection,fmt.Sprint(os.Getenv("DB_MONGO_DATABASE")))
+	DB = mongo.OpenDB(urlConnection,fmt.Sprint(os.Getenv("DB_MONGO_DATABASE")))
 }
 
 func devConnectionScript() string {
