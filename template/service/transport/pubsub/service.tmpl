@@ -1,0 +1,109 @@
+package pubsub
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"log"
+	"sync"
+	"time"
+
+	"cloud.google.com/go/pubsub"
+	"github.com/newrelic/go-agent/v3/newrelic"
+	"github.com/tidwall/gjson"
+	"{{.ProjectName}}/entity"
+	"{{.ProjectName}}/util"
+	"gitlab.com/qasir/web/project/qasircore.git/apm"
+)
+
+// Service struct
+type PubSub struct {
+	e util.Error
+	c *pubsub.Client
+}
+
+func NewPubSubService(client *pubsub.Client) *PubSub {
+	var ps PubSub
+	ps.c = client
+	return &ps
+}
+
+func (ps *PubSub) createSubscriptionIfNotExists(ctx context.Context, topicName, subscription string) (*pubsub.Subscription, error) {
+	s := ps.c.Subscription(subscription)
+	ok, err := s.Exists(ctx)
+	if err != nil {
+		return s, err
+	}
+	if !ok {
+		s, err = ps.c.CreateSubscription(ctx, subscription, pubsub.SubscriptionConfig{
+			Topic:       ps.c.Topic(topicName),
+			AckDeadline: Config.AckDeadline,
+		})
+		if err != nil {
+			return s, err
+		}
+	}
+	s.ReceiveSettings.Synchronous = Config.Synchronous
+	s.ReceiveSettings.MaxExtension = Config.MaxExtension
+	s.ReceiveSettings.MaxOutstandingMessages = Config.MaxOutstandingMessages
+	s.ReceiveSettings.MaxOutstandingBytes = Config.MaxOutstandingBytes
+	s.ReceiveSettings.NumGoroutines = Config.NumGoroutines
+
+	log.Println("ReceiveSettings", s.ReceiveSettings)
+	return s, nil
+}
+
+func (ps *PubSub) Start() {
+	cctx := context.Background()
+	sub, err := ps.createSubscriptionIfNotExists(cctx, Config.TopicPosInventory, Config.SubPosInventory)
+	if err != nil {
+		log.Panicln("subscription error : ", err)
+	}
+	fmt.Printf("⇨ Pub/Sub Async Pull : %s | %s \n", Config.TopicPosInventory, Config.SubPosInventory)
+	var mu sync.Mutex
+	err = sub.Receive(cctx, func(_ context.Context, msg *pubsub.Message) {
+		mu.Lock()
+		msg.Ack()
+		begin := time.Now()
+		action := gjson.Get(string(msg.Data), "action").String()
+		data := gjson.Get(string(msg.Data), "data").String()
+		var attr string
+		if len(msg.Attributes) > 1 {
+			b, _ := json.Marshal(msg.Attributes)
+			attr = string(b)
+		}
+		app := apm.NewRelicApp
+		txn := app.StartTransaction("pubsub:" + action)
+		s := txn.StartSegment(action)
+		s.AddAttribute("topic", Config.TopicPosInventory)
+		s.AddAttribute("sub", Config.SubPosInventory)
+		s.AddAttribute("action", action)
+		s.AddAttribute("attr", attr)
+		s.AddAttribute("payload", data)
+		s.StartTime = txn.StartSegmentNow()
+
+		txCtx := newrelic.NewContext(context.Background(), txn)
+		log.Printf("[PUB/SUB-%s][%s] retry-%v: %s", msg.ID, action, msg.DeliveryAttempt, string(msg.Data))
+		defer func() {
+			mu.Unlock()
+			s.End()
+			txn.End()
+			msg.Nack()
+		}()
+
+		if f, ok := MessageServiceMapping[action]; ok {
+			err := f.Handle(txCtx, msg.Attributes, msg.Data)
+			if err != nil || txCtx.Err() != nil {
+				log.Printf("[PUB/SUB-%s][%s] %s, error : %v , %v", msg.ID, action, "Nack()", err, txCtx.Err())
+			} else {
+				log.Printf("[PUB/SUB-%s][%s] Proceed", msg.ID, action)
+			}
+		} else {
+			log.Printf("[PUB/SUB-%s][%s] %s, Invalid Action", msg.ID, action, "Ack()")
+		}
+		log.Printf("[PUB/SUB-%s][%s] elapsed : %s", msg.ID, action, time.Since(begin))
+	})
+	if err != nil {
+		log.Fatalf("failed to pull pub/sub message : %v", err)
+	}
+}

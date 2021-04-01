@@ -1,0 +1,19 @@
+package pubsub
+
+import (
+	"context"
+
+	"{{.ProjectName}}/transport/pubsub/handler"
+)
+
+const (
+	SomeAction = "some:action"
+)
+
+type MessageHandler interface {
+	Handle(ctx context.Context, attributes map[string]string, data []byte) error
+}
+
+var MessageServiceMapping = map[string]MessageHandler{
+	SomeAction:      handler.NewHandler(),
+}

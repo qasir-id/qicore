@@ -1,4 +1,4 @@
-package mongo
+package userdb_mongo
 
 import (
 	"context"
@@ -7,44 +7,19 @@ import (
 	"os"
 	"time"
 
-	"go.elastic.co/apm/module/apmmongo"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"gitlab.com/qasir/web/project/qasircore.git/database/mongo"
 )
 
-var MongoDB *mongo.Database
+var DB *mongo.Database
 
 // InitCon handler connection for mongodb
-func InitCon() {
-	var urlConnection string
-
-	mongoCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	urlConnection = devConnectionScript()
+func OpenDB() {
+	urlConnection := devConnectionScript()
 	if fmt.Sprint(os.Getenv("APP_ENV")) == "production" || fmt.Sprint(os.Getenv("APP_ENV")) == "prod" {
 		urlConnection = prodConnectionScript()
 	}
-
-	db, err := mongo.Connect(
-		mongoCtx,
-		options.Client().ApplyURI(urlConnection),
-		options.Client().SetMonitor(apmmongo.CommandMonitor()),
-		options.Client().SetMaxPoolSize(30),
-	)
-	if err != nil {
-		log.Fatal("Could not connect to MongoDB: ", err)
-	}
-
-	// Check the connection
-	err = db.Ping(mongoCtx, nil)
-	if err != nil {
-		log.Fatal("Could not connect to MongoDB Server: ", err)
-	}
-
-	fmt.Printf("⇨ %s Data source %s:%s , Successfully connected! \n", os.Getenv("DB_MONGO_DRIVER"), os.Getenv("DB_MONGO_HOST"), os.Getenv("DB_MONGO_PORT"))
-
-	MongoDB = db.Database(fmt.Sprint(os.Getenv("DB_MONGO_DATABASE")))
+	DB = mongo.OpenDB(urlConnection,fmt.Sprint(os.Getenv("DB_MONGO_DATABASE")))
 }
 
 func devConnectionScript() string {

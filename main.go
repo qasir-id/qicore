@@ -18,9 +18,9 @@ func main() {
 	app.Usage = "Generate scaffold project layout for Qasir Team"
 	app.Commands = []*cli.Command{
 		{
-			Name:    "qsr-service",
+			Name:    "service",
 			Aliases: []string{"i"},
-			Usage:   "qsr-service -n 'service name'",
+			Usage:   "service -n 'service name'",
 			Flags: []cli.Flag{
 				&cli.StringFlag{Name: "name", Aliases: []string{"n"}},
 			},
@@ -33,14 +33,14 @@ func main() {
 					SubStrService: "service",
 				})
 				if err == nil {
-					fmt.Println("Success Created. Please excute `go run main.go` to start service.")
+					fmt.Println("Success Created. Please execute `go run main.go` to start service.")
 				}
 				return err
 			},
 		}, {
-			Name:    "qsr-gateway",
+			Name:    "gateway",
 			Aliases: []string{"i"},
-			Usage:   "qsr-gateway -n 'gateway name'",
+			Usage:   "gateway -n 'gateway name'",
 			Flags: []cli.Flag{
 				&cli.StringFlag{Name: "name", Aliases: []string{"n"}},
 			},
@@ -53,7 +53,7 @@ func main() {
 					SubStrService: "gateway",
 				})
 				if err == nil {
-					fmt.Println("Success Created. Please excute `go run main.go` to start service.")
+					fmt.Println("Success Created. Please execute `go run main.go` to start service.")
 				}
 				return err
 			},

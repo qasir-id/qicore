@@ -21,6 +21,6 @@ export PATH="$GOPATH/bin:$PATH"
 ## Usage 
 
 ```sh
-qicore qsr-service -n "service-name"
-qicore qsr-gateway -n "gateway-name"
+qicore service -n "service-name"
+qicore gateway -n "gateway-name"
 ```
