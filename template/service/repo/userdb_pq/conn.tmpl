@@ -16,23 +16,23 @@ var DB *sqlx.DB
 func OpenDB() {
 	urlConnection := fmt.Sprintf(
     		"user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
-    		os.Getenv("INVENTORY_DB_USER"),
-    		os.Getenv("INVENTORY_DB_PASSWORD"),
-    		os.Getenv("INVENTORY_DB_HOST"),
-    		os.Getenv("INVENTORY_DB_PORT"),
-    		os.Getenv("INVENTORY_DB_DATABASE"),
+    		os.Getenv("USER_DB_PQ_USER"),
+    		os.Getenv("USER_DB_PQ_PASSWORD"),
+    		os.Getenv("USER_DB_PQ_HOST"),
+    		os.Getenv("USER_DB_PQ_PORT"),
+    		os.Getenv("USER_DB_PQ_DATABASE"),
     	)
 
-	db, err := database.OpenDBx(os.Getenv("INVENTORY_DB_DRIVER"), urlConnection)
+	db, err := database.OpenDBx(os.Getenv("USER_DB_PQ_DRIVER"), urlConnection)
 	if err != nil {
-		log.Panicf("⇨ %s Data source %s , Failed : %s \n", os.Getenv("INVENTORY_DB_DRIVER"), os.Getenv("INVENTORY_DB_DATABASE"), err.Error())
+		log.Panicf("⇨ %s Data source %s , Failed : %s \n", os.Getenv("USER_DB_PQ_DRIVER"), os.Getenv("USER_DB_PQ_DRIVER"), err.Error())
 	}
 
     // optionally you can handle pool connection locally
-	db.SetMaxOpenConns(int(util.AtoI64(os.Getenv("INVENTORY_DB_MAX_CONN"))))
-	db.SetMaxIdleConns(int(util.AtoI64(os.Getenv("INVENTORY_DB_MAX_IDLE_CONN"))))
+	db.SetMaxOpenConns(int(util.AtoI64(os.Getenv("USER_DB_PQ_MAX_CONN"))))
+	db.SetMaxIdleConns(int(util.AtoI64(os.Getenv("USER_DB_PQ_MAX_IDLE_CONN"))))
 	db.SetConnMaxLifetime(5 * time.Minute)
 
-	log.Printf("⇨ %s Data source %s  \n", os.Getenv("INVENTORY_DB_DRIVER"), os.Getenv("INVENTORY_DB_DATABASE"))
+	log.Printf("⇨ %s Data source %s  \n", os.Getenv("USER_DB_PQ_DRIVER"), os.Getenv("USER_DB_PQ_DRIVER"))
 	DB = db
 }
