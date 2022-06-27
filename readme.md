@@ -1,4 +1,4 @@
-# Qasir Core
+# CLI Skeleton Go Qasir
 
 A tool that generates a skeleton service for qasir team
 
