@@ -6,8 +6,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	customMw "gitlab.com/qasir/{{.ProjectName}}/route/middleware"
-	"gitlab.com/qasir/{{.ProjectName}}/util"
+	customMw "gitlab.com/qasir/gateway-fajri/route/middleware"
+	"gitlab.com/qasir/gateway-fajri/util"
 	qHttp "gitlab.com/qasir/web/project/qasircore.git/transport/http"
 	"gitlab.com/qasir/web/project/qasircore.git/runtime"
 	"go.elastic.co/apm/module/apmechov4"

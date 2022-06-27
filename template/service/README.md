@@ -1,2 +1,2 @@
-# {{.ProjectName}}
+# gitlab.com/qasir/{{.ProjectName}}
 

@@ -5,23 +5,37 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis/v8"
+	qRedis "gitlab.com/qasir/web/project/qasircore.git/database/redis"
 )
 
-var Client *redis.Client
+//redisDB struct redis cliet
+var RedisDB *redis.Client
 
-const DefaultDB = 2
+const DefaultDB = 12
 
-func OpenClient() {
+//InitCon for set init connection for redis
+func InitCon() {
 	db, err := strconv.Atoi(os.Getenv("REDIS_DB"))
 	if err != nil {
 		db = DefaultDB
 	}
-	Client = qRedis.OpenClient(&redis.Options{
-		Addr:     os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT"),
+
+	// RedisDB = qRedis.OpenClient(opt)
+	RedisDB = qRedis.OpenClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT_NUMBER")),
 		Password: os.Getenv("REDIS_PASSWORD"),
 		DB:       db,
 	})
-}
 
+	fmt.Printf("⇨ Connect Redis to Server %s ... \n", RedisDB)
+
+	_, err = RedisDB.Ping(context.Background()).Result()
+	if err != nil {
+		log.Fatalf("error initializing Redis Client: %v\n", err)
+	}
+
+	fmt.Printf("⇨ redis Data source %s:%s , Successfully connected! \n", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
+}

@@ -2,12 +2,7 @@ package main
 
 import (
     "log"
-	"{{.ProjectName}}/transport/grpc"
-	"{{.ProjectName}}/transport/pubsub"
-	mgo "{{.ProjectName}}/repo/userdb-mongo"
-	mysql "{{.ProjectName}}/repo/userdb-mysql"
-	pq "{{.ProjectName}}/repo/userdb-pq"
-	"{{.ProjectName}}/repo/redis"
+	"gitlab.com/qasir/{{.ProjectName}}/transport/grpc"
 	_ "gitlab.com/qasir/web/project/qasircore.git" // dialect with qasir env & apm agent
 )
 
@@ -15,12 +10,13 @@ func main() {
     log.Println("service started !!")
 
     // init data source driver
-    mgo.OpenDB()
-    mysql.OpenDB()
-    pq.OpenDB()
-    redis.OpenClient()
+    // exampledb_mongo.OpenDB()
+    // exampledb_mysql.OpenDB()
+    // exampledb_pq.OpenDB()
+    // redis.OpenClient()
 
     // running transport
-    go pubsub.NewPubSubService(pubsub.NewClient(nil), nil).Start()
+    // go pubsub.NewPubSubService(pubsub.NewClient(nil), nil).Start()
+    // go rabbitmq.Run()
 	grpc.Run()
 }

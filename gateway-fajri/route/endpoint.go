@@ -2,7 +2,7 @@ package route
 
 import (
 	"github.com/labstack/echo/v4"
-	ping "gitlab.com/qasir/{{.ProjectName}}/domain/example/handler"
+	ping "gitlab.com/qasir/gateway-fajri/domain/example/handler"
 )
 
 type Handler interface {

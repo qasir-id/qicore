@@ -3,8 +3,8 @@ package handler
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	qodes "gitlab.com/qasir/web/project/qasircore.git/grpc/codes"
-	qhttp "gitlab.com/qasir/web/project/qasircore.git/http"
+	qodes "gitlab.com/qasir/web/project/qasircore.git/transport/grpc/codes"
+	qhttp "gitlab.com/qasir/web/project/qasircore.git/transport/http"
 )
 
 type GetPing struct{}

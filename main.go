@@ -33,7 +33,7 @@ func main() {
 					SubStrService: "service",
 				})
 				if err == nil {
-					fmt.Println("Success Created. Please execute `go run main.go` to start service.")
+					fmt.Println("Success Created. Please copy .env.example and execute `go mod tidy` and `go run main.go` to start service.")
 				}
 				return err
 			},
@@ -53,7 +53,7 @@ func main() {
 					SubStrService: "gateway",
 				})
 				if err == nil {
-					fmt.Println("Success Created. Please execute `go run main.go` to start service.")
+					fmt.Println("Success Created. Please copy env.example and execute `go mod tidy` and `go run main.go` to start service.")
 				}
 				return err
 			},

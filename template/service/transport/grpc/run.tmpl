@@ -5,25 +5,25 @@ import (
 	"net"
 	"os"
 
-	"{{.ProjectName}}/transport/grpc/proto/contract"
-	qGrpc "gitlab.com/qasir/web/project/qasircore.git/grpc"
+	pb "gitlab.com/qasir/{{.ProjectName}}/entity"
+	qGrpc "gitlab.com/qasir/web/project/qasircore.git/transport/grpc"
 	"google.golang.org/grpc/reflection"
+	"gitlab.com/qasir/{{.ProjectName}}/action"
 )
 
 func Run() {
-	lis, err := net.Listen("tcp", ":"+os.Getenv("GRPC_PORT"))
+	lis, err := net.Listen("tcp", ":"+os.Getenv("APP_GRPC_PORT"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	} else {
-		log.Println("Connect GRPC to port " + os.Getenv("GRPC_PORT"))
+		log.Println("Connect GRPC to port " + os.Getenv("APP_GRPC_PORT"))
 	}
 	log.Println("Connect To Register Product Server")
 	s := qGrpc.NewServer()
-	contract.RegisterContractServiceServer(s, NewContractServer())
+	pb.RegisterExampleServer(s, action.New())
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-
 }

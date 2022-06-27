@@ -178,9 +178,11 @@ func (templEngine *templateEngine) visit(path string, f os.FileInfo, err error) 
 		subStr := strings.Index(filepath.Dir(path), SubStrService+"/")
 		dirTemp := ""
 		if subStr > -1 {
-			dirTemp = genFileBasePath[subStr+7:]
+			dirTemp = genFileBasePath[7:]
+			projectName += dirTemp
+		} else {
+			projectName += dirTemp + "/" + templateFileName
 		}
-		projectName += dirTemp + "/" + templateFileName
 		templ := templateSet{
 			templateFilePath: path,
 			templateFileName: templateFileName,

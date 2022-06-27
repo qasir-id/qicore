@@ -1,0 +1,10 @@
+[
+  {
+    "path": "/api/v1/ping",
+    "method": "GET",
+    "module": "default",
+    "tag": "default",
+    "endpoint_filter": "ping",
+    "middleware": []
+  }
+]

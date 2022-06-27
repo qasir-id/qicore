@@ -11,14 +11,11 @@ import (
 	"cloud.google.com/go/pubsub"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/tidwall/gjson"
-	"{{.ProjectName}}/entity"
-	"{{.ProjectName}}/util"
 	"gitlab.com/qasir/web/project/qasircore.git/apm"
 )
 
 // Service struct
 type PubSub struct {
-	e util.Error
 	c *pubsub.Client
 }
 

@@ -1,3 +1,3 @@
-module {{.ProjectName}}
+module gitlab.com/qasir/{{.ProjectName}}
 
-go 1.13
+go 1.18

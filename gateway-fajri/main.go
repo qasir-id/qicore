@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"gitlab.com/qasir/{{.ProjectName}}/route"
-	"gitlab.com/qasir/{{.ProjectName}}/util"
+	"gitlab.com/qasir/gateway-fajri/route"
+	"gitlab.com/qasir/gateway-fajri/util"
 	"gitlab.com/qasir/web/project/qasircore.git"
 )
 
