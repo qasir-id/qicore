@@ -61,6 +61,7 @@ qicore gateway -n "gateway-name"
 ```
 ├── action
 │   └── example
+│       └── example_test.go
 │       └── example.go
 |       └── handler.go
 ├── entity
@@ -81,6 +82,7 @@ qicore gateway -n "gateway-name"
 │   └── redis
 |       └── client.go
 |       └── conn.go
+│   └── example_test.go
 │   └── example.go
 ├── transport
 │   └── grpc
