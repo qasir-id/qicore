@@ -1,0 +1,20 @@
+package repo
+
+import (
+	"context"
+	pb "gitlab.com/qasir/{{.ProjectName}}/entity"
+)
+
+type Example interface {
+	Example(ctx context.Context, id) (result *pb.Example, err error)
+}
+
+type Example struct {}
+
+func NewExample() Example {
+	return &Example{}
+}
+
+func (s stockRepo) Example(ctx context.Context, id) (result *pb.Example, err error) {
+	return
+}

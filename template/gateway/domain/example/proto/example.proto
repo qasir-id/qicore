@@ -1,0 +1,18 @@
+syntax="proto3";
+
+package example;
+
+option go_package = "./example";
+
+service Example {
+    rpc Example(ExampleRequest) returns (ExampleResponse);
+}
+
+message ExampleRequest {
+    string token = 1;
+}
+
+message ExampleResponse {
+    string id = 1;
+    string title = 2;
+}

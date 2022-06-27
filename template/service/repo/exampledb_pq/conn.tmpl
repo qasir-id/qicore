@@ -1,0 +1,38 @@
+package exampledb_pq
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"time"
+
+	"github.com/jmoiron/sqlx"
+	"gitlab.com/qasir/{{.ProjectName}}/util"
+	"gitlab.com/qasir/web/project/qasircore.git/database"
+)
+
+var DB *sqlx.DB
+
+func OpenDB() {
+	urlConnection := fmt.Sprintf(
+    		"user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
+    		os.Getenv("EXAMPLE_DB_PQ_USER"),
+    		os.Getenv("EXAMPLE_DB_PQ_PASSWORD"),
+    		os.Getenv("EXAMPLE_DB_PQ_HOST"),
+    		os.Getenv("EXAMPLE_DB_PQ_PORT"),
+    		os.Getenv("EXAMPLE_DB_PQ_DATABASE"),
+    	)
+
+	db, err := database.OpenDBx(os.Getenv("EXAMPLE_DB_PQ_DRIVER"), urlConnection)
+	if err != nil {
+		log.Panicf("⇨ %s Data source %s , Failed : %s \n", os.Getenv("EXAMPLE_DB_PQ_DRIVER"), os.Getenv("EXAMPLE_DB_PQ_DRIVER"), err.Error())
+	}
+
+    // optionally you can handle pool connection locally
+	db.SetMaxOpenConns(int(util.AtoI64(os.Getenv("EXAMPLE_DB_PQ_MAX_CONN"))))
+	db.SetMaxIdleConns(int(util.AtoI64(os.Getenv("EXAMPLE_DB_PQ_MAX_IDLE_CONN"))))
+	db.SetConnMaxLifetime(5 * time.Minute)
+
+	log.Printf("⇨ %s Data source %s  \n", os.Getenv("EXAMPLE_DB_PQ_DRIVER"), os.Getenv("EXAMPLE_DB_PQ_DRIVER"))
+	DB = db
+}

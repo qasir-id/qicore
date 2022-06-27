@@ -1,0 +1,12 @@
+package rabbitmq
+
+import (
+	"os"
+	"gitlab.com/qasir/web/project/qasircore.git/message-broker/rabbitmq"
+)
+
+
+func Run() {
+	rabbitmq.New(os.Getenv("AMQP_QUEUE_TOPIC"), rabbitmq.Conn(os.Getenv("AMQP_URL"))).
+		Consume(os.Getenv("AMQP_QUEUE_SUB"), ActionHandler)
+}

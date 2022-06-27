@@ -1,6 +1,0 @@
-# https://gitlab.com/qasir/qasir-pos-gateway/-/pipelines/new?ref=devops-ci-pipeline&var[DEBUG_DEVOPS]=true
-
-include:
-  - project: 'qasir/devops/qasir-cicd'
-    ref: 'master'
-    file: '/templates/gitlab-ci-impl/workflow-standard.yml'

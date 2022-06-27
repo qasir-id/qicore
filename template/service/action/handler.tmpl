@@ -1,0 +1,16 @@
+package action
+
+import (
+	pb "gitlab.com/qasir/{{.ProjectName}}/entity"
+)
+
+type Handler interface {
+	pb.ExampleServer
+}
+
+
+type handler struct {}
+
+func New() Handler {
+	return handler{}
+}

@@ -1,0 +1,55 @@
+package redis
+
+import (
+	"context"
+	"encoding/json"
+	"time"
+
+	"github.com/go-redis/redis/v8"
+)
+
+// IRedis is a interface for redis
+type RedisInterface interface {
+	Get(context.Context, *redis.Client, string) (string, error)
+	Set(context.Context, *redis.Client, string, interface{}, time.Duration) error
+	Del(context.Context, *redis.Client, string) error
+	GetBytes(context.Context, *redis.Client, interface{}, string) error
+}
+
+// Client is a struct to mongo
+type Client struct{}
+
+// NewClient for initiate function in redis
+func NewClient() *Client {
+	return &Client{}
+}
+
+// Get is a get data in redis
+func (c *Client) Get(ctx context.Context, db *redis.Client, key string) (string, error) {
+	return db.Get(ctx, key).Result()
+}
+
+// Set is a set data in redis
+func (c *Client) Set(ctx context.Context, db *redis.Client, key string, value interface{}, duration time.Duration) error {
+	b, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+
+	return db.Set(ctx, key, b, duration).Err()
+}
+
+// Del is a delete data in redis
+func (c *Client) Del(ctx context.Context, db *redis.Client, key string) error {
+	return db.Del(ctx, key).Err()
+}
+
+func (c *Client) GetBytes(ctx context.Context, db *redis.Client, data interface{}, key string) error {
+	v, err := db.Get(ctx, key).Bytes()
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(v, &data)
+	return err
+}
